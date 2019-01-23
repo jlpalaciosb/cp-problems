@@ -59,10 +59,9 @@ int main() {
 
 		cout << "Case Number  " << cn++ << endl;
 		cout << "Number of Customers: " << max << endl;
-		cout << "Locations recommended: ";
-		int tmp = 1;
+		cout << "Locations recommended:";
 		for(int i = 1; i <= n; i++)
-			if(selected[i]) cout << i << (++tmp <= r ? " " : "");
+			if(selected[i]) cout << " " << i;
 		cout << endl << endl;
 	}
 	return 0;
