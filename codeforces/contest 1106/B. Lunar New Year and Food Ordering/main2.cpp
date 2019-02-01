@@ -1,5 +1,4 @@
-/* Apparently this should be faster, but the truth is that
-   it had the same execution time as `main1.cpp` */
+/* Apparently this should be faster, but it had the same execution time as `main1.cpp` */
 
 #include <iostream>
 #include <algorithm>
