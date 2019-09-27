@@ -120,6 +120,7 @@ private:
 		lazy[p] = {NULL, NULL, 0};
 	}
 
+	// update debe ser O(log(n))
 	void update(int p, int L, int R, int a, int b, int val) {
 		updateNode(p, L, R); // execute pending operations on this node
 	  
