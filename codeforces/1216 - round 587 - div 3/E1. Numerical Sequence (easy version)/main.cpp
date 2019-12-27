@@ -4,50 +4,50 @@
 #include <cstring>
 using namespace std;
 typedef long long ll;
+typedef long double ld;
 
-int ndigb[50010]; // numero de digitos del bloque i
-ll cum[50010]; // numero de digitos en la secuencia al agregar el bloque i
+int ndigb[25000]; // numero de digitos del bloque i
+int cum[25000]; // numero de digitos en la secuencia al agregar el bloque i
+int NB;
 
 // numero de digitos de n
 int ndig(int n) {
 	return floor(log(n) / log(10)) + 1;
 }
 
-// digito en la posicion i de n, dig(8391, 2) = 9
-char buffer[33];
-int dig(int n, int i) {
-	sprintf(buffer, "%d", n);
-	return buffer[i] - '0';
+char kth_digit(ll k) {
+	ll len = 1, cum = 0;
+	while (true) {
+		ll first = powl(10, len - 1);
+		ll c = 9 * (ll)powl(10, len - 1) * len;
+		if (k <= cum + c) {
+			ll n = first + ceil((ld)(k - cum) / (ld)len) - 1;
+			int i = (k - cum - 1) % len;
+			char buffer[50];
+			sprintf(buffer, "%lld", n);
+			return buffer[i];
+		}
+		cum += c;
+		len++;
+	}
 }
 
-// digito en la posicion i de 123456789101112...
-int dig(int i) {
-	if (i <= 9)
-		return i;
-	if (i <= 189)
-		return dig(10 + (i - 1 - 9) / 2, (i - 1 - 9) % 2);
-	if (i <= 2889)
-		return dig(100 + (i - 1 - 189) / 3, (i - 1 - 189) % 3);
-	if (i <= 38889)
-		return dig(1000 + (i - 1 - 2889) / 4, (i - 1 - 2889) % 4);
-	if (i <= 488889)
-		return dig(10000 + (i - 1 - 38889) / 5, (i - 1 - 38889) % 5);
-	if (i <= 5888889)
-		return dig(100000 + (i - 1 - 488889) / 6, (i - 1 - 488889) % 6);
-	return -1;
-}
-
-int solve(int k) {
-	int b = upper_bound(cum, cum + 50001, k) - cum;
+char solve(int k) {
+	int b = upper_bound(cum, cum + NB + 1, k) - cum;
 	if (cum[b - 1] == k) b = b - 1;
-	return dig(k - cum[b - 1]);
+	printf("* %d %d %d/%d\n", cum[b - 1], cum[b], b, NB);
+	printf("* %d/%d\n", k - cum[b - 1], ndigb[b]);
+	return kth_digit(k - cum[b - 1]);
 }
 
 int main() {
 	ndigb[0] = cum[0] = 0;
-	for (int i = 1; i <= 50000; ++i) {
+	bool f = false;
+	for (int i = 1; i < 25000; ++i) {
 		ndigb[i] = ndigb[i - 1] + ndig(i);
 		cum[i] = cum[i - 1] + ndigb[i];
+		NB = i;
+		if (cum[i] > 1000000000) break;
 	}
 
 	int q; cin >> q;

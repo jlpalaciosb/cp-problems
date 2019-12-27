@@ -7,8 +7,7 @@ typedef vector<int> vi;
 class SegmentTree {
 private:
 	vi st;
-	vi lazy;
-	vector<bool> inv;
+	vi lazy_val, lazy_inv;
 	int n;
 	int left (int p) { return p << 1; }
 	int right(int p) { return (p << 1) + 1; }
@@ -24,24 +23,23 @@ private:
 	int sum(int p, int L, int R, int i, int j) {
 		if (i > R || j < L) return 0; // rango actual afuera
 
-		if (lazy[p] != -1) {
-			st[p] = lazy[p] * (R - L + 1);
+		if (lazy_val[p] != -1) {
+			st[p] = lazy_val[p] * (R - L + 1);
 			if (L != R) {
-				lazy[left(p)] = lazy[right(p)] = lazy[p];
+				lazy_val[left(p)] = lazy_val[right(p)] = lazy_val[p];
 			}
-			lazy[p] = -1;
+			lazy_val[p] = -1;
 		}
 
-		if (i <= L && R <= j) { // rango actual adentro
-			if (!inv[p]) return st[p];
-			else return (R - L + 1) - st[p];
+		if (lazy_inv[p] != 0) {
+			if (lazy_inv[p] % 2 == 1) st[p] = (R - L + 1) - st[p];
+			if (L != R) {
+				lazy_inv[left(p)] += lazy_inv[p];
+				lazy_inv[right(p)] += lazy_inv[p];
+			}
 		}
 
-		if (inv[p]) {
-			inv[left(p)] = !inv[left(p)];
-			inv[right(p)] = !inv[right(p)];
-			inv[p] = false;
-		}
+		if (i <= L && R <= j) return st[p]; // rango actual adentro
 
 		int s1 = sum(left(p), L, (L + R) / 2, i, j);
 		int s2 = sum(right(p), (L + R) / 2 + 1, R , i, j);
@@ -51,8 +49,8 @@ private:
 		if (i > R || j < L) {
 			return; // rango actual afuera
 		} else if (i <= L && R <= j) { // rango actual adentro
-			lazy[p] = 1;
-			inv[p] = false;
+			lazy_val[p] = 1;
+			lazy_inv[p] = 0;
 		} else {
 			full(left(p), L, (L + R) / 2, i, j);
 			full(right(p), (L + R) / 2 + 1, R , i, j);
@@ -62,8 +60,8 @@ private:
 		if (i > R || j < L) {
 			return; // rango actual afuera
 		} else if (i <= L && R <= j) { // rango actual adentro
-			lazy[p] = 0;
-			inv[p] = false;
+			lazy_val[p] = 0;
+			lazy_inv[p] = 0;
 		} else {
 			empty(left(p), L, (L + R) / 2, i, j);
 			empty(right(p), (L + R) / 2 + 1, R , i, j);
@@ -73,7 +71,7 @@ private:
 		if (i > R || j < L) {
 			return; // rango actual afuera
 		} else if (i <= L && R <= j) { // rango actual adentro
-			inv[p] = !inv[p];
+			lazy_inv[p] += 1;
 		} else {
 			invert(left(p), L, (L + R) / 2, i, j);
 			invert(right(p), (L + R) / 2 + 1, R , i, j);
@@ -83,8 +81,8 @@ public:
 	SegmentTree(const vi &A) {
 		n = (int)A.size();
 		st.assign(4 * n, 0);
-		lazy.assign(4 * n, -1);
-		inv.assign(4 * n, false);
+		lazy_val.assign(4 * n, -1);
+		lazy_inv.assign(4 * n, 0);
 		build(A, 1, 0, n - 1);
 	}
 	void full(int i, int j) {
