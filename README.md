@@ -1,1 +1,1 @@
-Solutions to some problems of online judges
+Solving problems of competitive programming contests.
